@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset=utf-8>
+    <!--base url='http://lzw.me'-->
+    <title>搜索建议自动智能提示 jQuery 插件使用效果示例</title>
+    <meta name="keywords" content="搜索建议,智能提示,搜索框提示,jQuery 插件">
+    <meta name="description" content="由志文工作室开发的搜索建议 jQuery 插件，提供三种主要显示风格">
+    <link href="css/bootstrap.css" rel="stylesheet">
+    <link href="css/bootstrap-responsive.css"  rel="stylesheet">
+    <style type="text/css">
+      body {
+        padding-top: 60px;
+        padding-bottom: 40px;
+        font-family:"微软雅黑",'Microsoft YaHei','Segoe UI', Arial, 'Microsoft Yahei', Simsun, 'sans-serif';
+      }
+          .nav-sider{ padding:9px 0px}
+    </style>
+</head>
+<body>
+<!--导航-->
+<div class="navbar navbar-fixed-top">
+        <div class="navbar-inner">
+        <div class="container-fluid">
+            <a class="brand" href="/" target="_blank">搜索建议自动智能提示 jQuery 插件使用方法与示例 - 志文工作室</a>
+        </div>
+    </div>
+</div>
+<!--//导航-->
+<!--主体-->
+<div class="container-fluid">
+        <div class="row-fluid">
+        <!--侧边栏-->
+        <div class="span2 bs-docs-sidebar">
+                
+            <div class="well nav-sider">
+                <ul class="nav nav-list">
+                    <li class="nav-header"><i class="icon-home"></i>实用工具</li>
+                    <li><a href="/pages/unicode/" target="_blank"><i class="icon-tag"></i>unicode 字符编/解码</a></li>
+                    <li><a href="/pages/htmljs/" target="_blank"><i class="icon-tag"></i>HTML/Js 转换</a></li>
+                    <li><a href="/pages/jsbeautify/" target="_blank"><i class="icon-tag"></i>js格式化/解压缩</a></li>
+                    <li><a href="/pages/jspacker/" target="_blank"><i class="icon-tag"></i>js压缩/代码混淆</a></li>
+                    <li><a href="/pages/utf8/" target="_blank"><i class="icon-tag"></i>中文UTF8编码转换</a></li>
+                    <li><a href="/pages/qrcode/" target="_blank"><i class="icon-tag"></i>二维码在线生成工具</a></li>
+                    <li><a href="/pages/csscompressor/" target="_blank"><i class="icon-tag"></i>CSS 格式化工具</a></li>
+                </ul>
+                <ul class="nav nav-list">
+                    <li class="nav-header"><i class="icon-home"></i>实用手册</li>
+                    <li><a href="/w3school/" target="_blank"><i class="icon-tag"></i>W3school</a></li>
+                    <li><a href="/pages/css3/" target="_blank"><i class="icon-tag"></i>CSS3在线</a></li>
+                </ul>
+            </div>
+        </div>        <!--//侧边栏-->
+        <!--内容-->
+        <div class="span10">
+            <table class="table table-bordered table-hover">
+                <thead>
+                        <tr>
+                        <th colspan="8">搜索建议自动智能提示 jQuery 插件使用方法与示例</th>
+                    </tr>
+                </thead>
+                <tbody>
+                        <tr>
+                            <td>自定义默认风格</td>
+                            <td><input type="text" size="50" id="default" autocomplete="off" /></td>
+                        </tr>
+                        <tr>
+                            <td>自定义list风格</td>
+                            <td><input type="text" size="50" id="list" autocomplete="off" /></td>
+                        </tr>
+                        <tr>
+                            <td>百度搜索建议</td>
+                            <td><input type="text" size="50" id="baidu_line" autocomplete="off" /></td>
+                        </tr>
+                        <tr>
+                            <td>淘宝搜索建议</td>
+                            <td><input type="text" size="50" id="taobao_list" autocomplete="off" /></td>
+                        </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="8">
+                            <button class="btn btn-primary"></button>
+                            <button class="btn btn-info"></button>
+                            <button class="btn btn-inverse"></button>
+                            <button class="btn btn-danger"></button>
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+            <div class="well">
+                <h2>插件使用方法</h2>
+                <h3>安装使用方法步骤</h3>
+                <p>1. 在页面引入 jQuery.j 及本插件脚本</p>
+                <pre>
+&lt;script type=&quot;text/javascript&quot; src=&quot;http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js&quot;&gt;&lt;/script&gt;
+&lt;script&gt;
+!window.jQuery &amp;&amp; document.write('&lt;script src=&quot;js/jquery-1.9.1.min.js&quot;&gt;&lt;\/script&gt;');
+&lt;/script&gt;
+
+&lt;script type=&quot;text/javascript&quot; src=&quot;js/search-suggest.js&quot;&gt;&lt;/script&gt;
+</pre>
+<p>2. 在页面定义插件初始化数据</p>
+<p>例如页面包含如下输入框：</p>
+<pre>
+百度搜索建议：  &lt;input type=&quot;text&quot; size=&quot;50&quot; id=&quot;baidu_line&quot; /&gt;
+淘宝搜索建议：  &lt;input type=&quot;text&quot; size=&quot;50&quot; id=&quot;taobao_list&quot; /&gt;
+自定义list风格：&lt;input type=&quot;text&quot; size=&quot;50&quot; id=&quot;list&quot; /&gt;
+自定义默认风格：&lt;input type=&quot;text&quot; size=&quot;50&quot; id=&quot;default&quot; /&gt;
+</pre>
+<h4>可定义的示例代码参考：</h4>
+
+<h5>自定义默认风格：</h5>
+<pre>
+$(&quot;#default&quot;).searchSuggest({
+    //url: '', //*优先从url ajax 请求 json 帮助数据/
+    json:{
+        'data':[
+            {'id':'0','word':'bytes=','description':'根据服务器发给客户端访问数据量搜索；单位为 byte&lt;br&gt;例如，搜索数据量大概在 20-50K 之间的日志：&lt;pre&gt;bytes=[20000,50000]&lt;/pre&gt;'},
+            {'id':'1','word':'contenttype=','description':'根据内容类型进行搜索&lt;br&gt;例如：&lt;pre&gt;contenttype=image/jpeg&lt;/pre&gt;'},
+            {'id':'2','word':'cookie=','description':'根据客户端 Cookie 进行搜索&lt;br&gt;例如：&lt;pre&gt;cookie=user &lt;/pre&gt;'},
+            {'id':'3','word':'domain=','description':'根据域名搜索&lt;br&gt;例如：&lt;pre&gt;domain=chinacache.com &lt;/pre&gt;提示：切割自请求 URL'},
+            {'id':'4','word':'elapsed=','description':'请求耗时&lt;br&gt;例如：&lt;pre&gt;elapsed==1&lt;/pre&gt;'},
+            {'id':'5','word':'fccode=','description':'根据状态码进行搜索&lt;br&gt;例如：&lt;pre&gt;fccode=TCP_REFRESH_HIT/304&lt;/pre&gt;'},
+            {'id':'6','word':'ip=','description':'根据客户端 IP 搜索&lt;br&gt;例如，搜索客户端 IP 为 127.0.0.1 或包含 192.168 的日志：&lt;pre&gt;ip={127.0.0.1,192.168}&lt;/pre&gt;'},
+            {'id':'7','word':'method=','description':'根据客户端请求方式搜索&lt;br&gt;例如：&lt;pre&gt;method=GET&lt;br&gt;method=POST&lt;br&gt;method={GET,POST}&lt;/pre&gt;'},
+            {'id':'8','word':'param=','description':'通过 URL 中传的参数进行搜索&lt;br&gt;例如：&lt;pre&gt;param=username &lt;/pre&gt;'},
+            {'id':'9','word':'peerinfo=','description':'根据回源信息进行搜索&lt;br&gt;例如：&lt;pre&gt;peerinfo=DIRECT/1.202.150.137 &lt;/pre&gt;回源信息字段包括下面的 Peercode 和 Peerhost'},
+            {'id':'10','word':'peercode=','description':'通过回源代码进行搜索&lt;br&gt;例如：&lt;pre&gt;peercode=DIRECT &lt;/pre&gt;注意：此为切割自 Peerinfo 字段'},
+            {'id':'11','word':'peerhost=','description':'根据回源主机进行搜索&lt;br&gt;例如：&lt;pre&gt;peerhost=1.202.150.137 &lt;/pre&gt;注意：此为切割自 Peerinfo 字段'},
+            {'id':'12','word':'referer=','description':'根据来路域名搜索&lt;br&gt;例如：&lt;pre&gt;referer=baidu.com &lt;/pre&gt;'},
+            {'id':'13','word':'result=','description':'根据请求结果搜索&lt;br&gt;例如：&lt;pre&gt;result=TCP_MEM_HIT&lt;/pre&gt;提示：为切割自 FC Code 字段'},
+            {'id':'14','word':'scheme=','description':'根据协议搜索&lt;br&gt;例如：&lt;pre&gt;scheme=http &lt;/pre&gt;提示：切割自请求 URL'},
+            {'id':'15','word':'status=','description':'根据状态码进行搜索&lt;br&gt;例如：&lt;pre&gt;status=404 &lt;/pre&gt;提示：为切割自 FC Code 字段'},
+            {'id':'16','word':'ua=','description':'根据浏览器客户端的 User Agent 信息进行搜索&lt;br&gt;例如：&lt;pre&gt;ua=chrome &lt;/pre&gt;'},
+            {'id':'17','word':'uri=','description':'根据请求的 URI 搜索&lt;br&gt;例如：&lt;pre&gt;uri=login &lt;/pre&gt;'},
+            {'id':'18','word':'url=','description':'根据请求的 URL 搜索&lt;br&gt;例如，搜索 URL 包含 chinacache.com 域名的日志：&lt;pre&gt;url=chinacache.com &lt;/pre&gt;提示：包括以下的Scheme、Domain、URI 及 Parameter'},
+            {'id':'19','word':'username=','description':'按照客户端用户名搜索&lt;br&gt;例如：&lt;pre&gt;username=- &lt;/pre&gt;提示：该字段一般为 - '}
+        ],
+        'defaults':'&lt;b&gt;日志搜索步骤&lt;/b&gt;&lt;br&gt;' +
+                    '1. 在右下角小窗口选定清单&lt;br/&gt;' +
+                    '2. 输入搜索条件查询&lt;br&gt;' +
+                    '3. 内容框载入最近 500 条信息，并在状态栏实时显示查询进度&lt;br&gt;&lt;br&gt;' +
+                    '&lt;b&gt;搜索语法示例&lt;/b&gt;&lt;br&gt;' +
+                    '1. 模糊搜索：直接输入关键字&lt;pre&gt;chinacache.com&lt;/pre&gt;' +
+                    '2. 集合的写法：&lt;pre&gt;foo={a,b,c}&lt;br&gt;foo!={a,b,c}&lt;/pre&gt;' +
+                    '3. 区间的写法：&lt;pre&gt;foo=[x,y]&lt;br&gt;foo=(x,y)&lt;br&gt;foo=[x,] foo=[,y]&lt;/pre&gt;' +
+                    '4. 精确匹配的写法：&lt;pre&gt;foo==a &lt;/pre&gt;' +
+                    '5. 多条件的搜索：&lt;pre&gt;foo=a bar=b&lt;br&gt;foo=[x,y] bar={a,b} far!=c&lt;/pre&gt;' +
+                    '&lt;br&gt;更多解释请参考: &lt;a href=&quot;/help/index.html#log-search&quot; target=&quot;_blank&quot;&gt;帮助文档&lt;/a&gt;'
+
+    },
+    width:380,   //提示框的宽度，缺省为输入框的宽度相同
+    topoffset: 16,  //*提示框与输入框的距离，缺省为5
+    style: 'default',
+    cssFile: 'css/search-suggest.css'
+
+});
+</pre>
+
+<h5>自定义 list 风格：</h5>
+<pre>
+$(&quot;#list&quot;).searchSuggest({
+    //url: 'http://localhost/tips/ajax?method=getsearchhelp', /*优先从url ajax 请求 json 帮助数据*/
+    json:{
+        'data':[
+            {'id':'0','word':'@','description':'根据设备名（或前缀）搜索&lt;br&gt;例如：&lt;code&gt;@CNC-BJ&lt;/code&gt;'},
+            {'id':'1','word':'~','description':'根据应用名称搜索&lt;br&gt;例如：&lt;code&gt;~FSCS&lt;/code&gt;'},
+            {'id':'2','word':'#','description':'根据频道名称搜索&lt;br&gt;例如：&lt;code&gt;#chinacache.com&lt;/code&gt;'},
+            {'id':'3','word':'/','description':'根据 MRTG 标注搜索&lt;br&gt;例如：&lt;code&gt;/apple&lt;/code&gt;'},
+            {'id':'4','word':'','description':'智能匹配，无需前缀标识&lt;br&gt;例如：&lt;code&gt;apple @CHN-BJ&lt;/code&gt;'}
+        ],
+        'defaults':'设备搜索帮助提示'
+    },//*/
+    width:350,   /*提示框的宽度，缺省为输入框的宽度相同*/
+    topoffset: 6,  /*提示框与输入框的距离，缺省为5*/
+    style: 'list',
+    cssFile: 'css/search-suggest.css'
+
+});
+</pre>
+
+<h5>百度搜索建议：（line 风格）</h5>
+<pre>
+$(&quot;#baidu_line&quot;).searchSuggest({
+    url: 'http://unionsug.baidu.com/su?p=3&amp;t='+ (new Date()).getTime() +'&amp;wd=', /*优先从url ajax 请求 json 帮助数据，注意最后一个参数为关键字请求参数*/
+    jsonp: 'cb',/*如果从 url 获取数据，并且需要跨域，则该参数必须设置*/
+    json:{
+        'data':[
+            {'id':'0','word':'baidu','description':''},
+            {'id':'1','word':'lzw.me','description':''},
+            {'id':'2','word':'w1.lzw.me','description':''},
+            {'id':'3','word':'g.lzw.me','description':''},
+            {'id':'4','word':'seo.lzw.me','description':''}
+        ],
+        'defaults':'http://lzw.me'
+    },
+    width:300,   /*提示框的宽度，缺省为输入框的宽度相同*/
+    topoffset: 6,  /*提示框与输入框的距离，缺省为5*/
+    style: 'line',
+    cssFile: 'css/search-suggest.css',
+    processData: function(json){// url 获取数据时，对数据的处理，作为 getData 的回调函数
+        if(!json || json.s.length == 0) return false;
+
+        console.log(json);
+
+        var jsonStr = &quot;{'data':[&quot;;
+        for (var i = json.s.length - 1; i &gt;= 0; i--) {
+            jsonStr += &quot;{'id':'&quot; + i 
+                + &quot;','word':'&quot;+ json.s[i]
+                + &quot;', 'description': ''},&quot;;
+        }
+        jsonStr += &quot;],'defaults':'baidu'}&quot;;
+
+        //字符串转化为 js 对象
+        return json = (new Function(&quot;return &quot;+jsonStr ))();
+    },
+    getData: function(word, parent, callback) {//数据获取方法
+        if(!word) return;
+        $.ajax({
+            type: 'GET',
+            /*data: &quot;word=&quot; + word,*/
+            url: 'http://unionsug.baidu.com/su?p=3&amp;t='+ (new Date()).getTime() +'&amp;wd=' + encodeURIComponent(word) + '&amp;cb=?',
+            //'http://suggest.taobao.com/sug?code=utf-8&amp;extras=1&amp;q='+word+'&amp;callback=?'
+            dataType: 'json',
+            timeout: 3000,
+            success: function(data) {
+                callback(parent, data);
+            },
+            error: function(data){callback(parent, data);}
+        });
+    }
+
+});
+</pre>
+
+<h5>淘宝搜索建议：（list 风格）</h5>
+<pre>
+$(&quot;#taobao_list&quot;).searchSuggest({
+    url: 'http://suggest.taobao.com/sug?code=utf-8&amp;extras=1&amp;q=', /*优先从url ajax 请求 json 帮助数据，注意最后一个参数为关键字请求参数*/
+    jsonp: 'callback',/*如果从 url 获取数据，并且需要跨域，则该参数必须设置*/
+    json:{
+        'data':[
+            {'id':'0','word':'baidu','description':''},
+            {'id':'1','word':'lzw.me','description':''},
+            {'id':'2','word':'w1.lzw.me','description':''},
+            {'id':'3','word':'g.lzw.me','description':''},
+            {'id':'4','word':'seo.lzw.me','description':''}
+        ],
+        'defaults':'http://lzw.me'
+    },//
+    width:350,   //提示框的宽度，缺省为输入框的宽度相同
+    topoffset: 6,  //提示框与输入框的距离，缺省为5
+    style: 'list',
+    cssFile: 'css/search-suggest.css',
+    tpl: '&lt;div class=&quot;list&quot;&gt;&lt;div class=&quot;word&quot; rel_id=&quot;st_{id}&quot;&gt;{word}&lt;/div&gt;&lt;div class=&quot;desc&quot;&gt;约{description}条记录&lt;/div&gt;&lt;/div&gt;',
+    processData: function(json){// url 获取数据时，对数据的处理，作为 getData 的回调函数
+        if(!json || json.result.length == 0) return false;
+
+        var jsonStr = &quot;{'data':[&quot;;
+        for (var i = json.result.length - 1; i &gt;= 0; i--) {
+            jsonStr += &quot;{'id':'&quot; + i 
+                + &quot;','word':'&quot;+ json.result[i][0]
+                + &quot;', 'description': '&quot;+ json.result[i][1] +&quot;'},&quot;;
+        }
+        jsonStr += &quot;],'defaults':'taobao'}&quot;;
+
+        //字符串转化为 js 对象
+        return json = (new Function(&quot;return &quot;+jsonStr ))();
+    },
+    getData: function(word, parent, callback) {//数据获取方法
+        if(!word) return;
+        $.ajax({
+            type: 'GET',
+            /*data: &quot;word=&quot; + word,*/
+            url: 'http://suggest.taobao.com/sug?code=utf-8&amp;extras=1&amp;q='+word+'&amp;callback=?',
+            dataType: 'json',
+            timeout: 3000,
+            success: function(data) {
+                callback(parent, data);
+            },
+            error: function(){
+                callback(parent, data);
+            }
+        });
+    }
+
+});
+
+</pre>
+                <h3>参数说明</h3>
+<pre>
+url:  , //请求数据的 URL。优先从url ajax 请求 json 帮助数据，注意最后一个参数为关键字请求参数
+jsonp: ,//设置此参数名，将开启jsonp功能，否则使用json数据结构
+json: {
+    'data':[
+        {'id':'0','word':'lzw.me','description':'http://lzw.me'},
+        {'id':'1','word':'w1.lzw.me','description':'http://w1.lzw.me'},
+        {'id':'2','word':'g.lzw.me','description':'http://g.lzw.me'}
+    ],
+    'defaults':'http://lzw.me'
+},                      //无 url 参数时从这里加载数据，注意格式
+style: 'default',       //风格样式，[line,list,default]
+cssFile: 'css/search-suggest.css', //提示框加载的 css 样式文件
+listHoverCSS: 'jhover', //提示框列表鼠标悬浮的样式
+tpl:                    //行模板
+width: 300,             //提示框的宽度，缺省为输入框的宽度相同
+topoffset:16,           //提示框与输入框的距离，缺省为5
+processData: processData, //格式化数据的方法，参考 json 参数的格式进行处理
+getData: getData,       //获取数据的方法，默认以插件定义为准
+</pre>
+            </div>
+        </div>
+        <!--//内容-->
+    </div>
+
+</div>
+<!--//主体-->
+
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script>
+    !window.jQuery && document.write('<script src="js/jquery-1.9.1.min.js"><\/script>');
+    </script>
+    <!--script type='text/javascript' src='http://code.jquery.com/jquery.min.js?ver=1'></script-->
+    <script src="js/bootstrap.js"></script>
+
+    <script type="text/javascript" src="js/search-suggest.js"></script>
+
+
+    <script type="text/javascript">
+
+        $(function() {
+
+            $("#baidu_line").searchSuggest({
+                url: 'http://unionsug.baidu.com/su?p=3&t='+ (new Date()).getTime() +'&wd=', /*优先从url ajax 请求 json 帮助数据，注意最后一个参数为关键字请求参数*/
+                jsonp: 'cb',/*如果从 url 获取数据，并且需要跨域，则该参数必须设置*/
+                json:{
+                    'data':[
+                        {'id':'0','word':'baidu','description':''},
+                        {'id':'1','word':'lzw.me','description':''},
+                        {'id':'2','word':'w1.lzw.me','description':''},
+                        {'id':'3','word':'g.lzw.me','description':''},
+                        {'id':'4','word':'seo.lzw.me','description':''}
+                    ],
+                    'defaults':'http://lzw.me'
+                },
+                width:300,   /*提示框的宽度，缺省为输入框的宽度相同*/
+                topoffset: 6,  /*提示框与输入框的距离，缺省为5*/
+                style: 'line',
+                cssFile: 'css/search-suggest.css',
+                processData: function(json){// url 获取数据时，对数据的处理，作为 getData 的回调函数
+                    if(!json || json.s.length == 0) return false;
+
+                    console.log(json);
+
+                    var jsonStr = "{'data':[";
+                    for (var i = json.s.length - 1; i >= 0; i--) {
+                        jsonStr += "{'id':'" + i 
+                            + "','word':'"+ json.s[i]
+                            + "', 'description': ''},";
+                    }
+                    jsonStr += "],'defaults':'baidu'}";
+
+                    //字符串转化为 js 对象
+                    return json = (new Function("return "+jsonStr ))();
+                },
+                getData: function(word, parent, callback) {//数据获取方法
+                    if(!word) return;
+                    $.ajax({
+                        type: 'GET',
+                        /*data: "word=" + word,*/
+                        url: 'http://unionsug.baidu.com/su?p=3&t='+ (new Date()).getTime() +'&wd=' + encodeURIComponent(word) + '&cb=?',
+                        //'http://suggest.taobao.com/sug?code=utf-8&extras=1&q='+word+'&callback=?'
+                        dataType: 'json',
+                        timeout: 3000,
+                        success: function(data) {
+                            callback(parent, data);
+                        },
+                        error: function(data){callback(parent, data);}
+                    });
+                }
+
+            });
+
+            $("#taobao_list").searchSuggest({
+                url: 'http://suggest.taobao.com/sug?code=utf-8&extras=1&q=', /*优先从url ajax 请求 json 帮助数据，注意最后一个参数为关键字请求参数*/
+                jsonp: 'callback',/*如果从 url 获取数据，并且需要跨域，则该参数必须设置*/
+                json:{
+                    'data':[
+                        {'id':'0','word':'baidu','description':''},
+                        {'id':'1','word':'lzw.me','description':''},
+                        {'id':'2','word':'w1.lzw.me','description':''},
+                        {'id':'3','word':'g.lzw.me','description':''},
+                        {'id':'4','word':'seo.lzw.me','description':''}
+                    ],
+                    'defaults':'http://lzw.me'
+                },//
+                width:350,   //提示框的宽度，缺省为输入框的宽度相同
+                topoffset: 6,  //提示框与输入框的距离，缺省为5
+                style: 'list',
+                cssFile: 'css/search-suggest.css',
+                tpl: '<div class="list"><div class="word" rel_id="st_{id}">{word}</div><div class="desc">约{description}条记录</div></div>',
+                processData: function(json){// url 获取数据时，对数据的处理，作为 getData 的回调函数
+                    if(!json || json.result.length == 0) return false;
+
+                    var jsonStr = "{'data':[";
+                    for (var i = json.result.length - 1; i >= 0; i--) {
+                        jsonStr += "{'id':'" + i 
+                            + "','word':'"+ json.result[i][0]
+                            + "', 'description': '"+ json.result[i][1] +"'},";
+                    }
+                    jsonStr += "],'defaults':'taobao'}";
+
+                    //字符串转化为 js 对象
+                    return json = (new Function("return "+jsonStr ))();
+                },
+                getData: function(word, parent, callback) {//数据获取方法
+                    if(!word) return;
+                    $.ajax({
+                        type: 'GET',
+                        /*data: "word=" + word,*/
+                        url: 'http://suggest.taobao.com/sug?code=utf-8&extras=1&q='+word+'&callback=?',
+                        dataType: 'json',
+                        timeout: 3000,
+                        success: function(data) {
+                            callback(parent, data);
+                        },
+                        error: function(){
+                            callback(parent, data);
+                        }
+                    });
+                }
+
+            });
+
+            $("#list").searchSuggest({
+                //url: 'http://localhost/tips/ajax?method=getsearchhelp', /*优先从url ajax 请求 json 帮助数据*/
+                json:{
+                    'data':[
+                        {'id':'0','word':'@','description':'根据设备名（或前缀）搜索<br>例如：<code>@CNC-BJ</code>'},
+                        {'id':'1','word':'~','description':'根据应用名称搜索<br>例如：<code>~FSCS</code>'},
+                        {'id':'2','word':'#','description':'根据频道名称搜索<br>例如：<code>#chinacache.com</code>'},
+                        {'id':'3','word':'/','description':'根据 MRTG 标注搜索<br>例如：<code>/apple</code>'},
+                        {'id':'4','word':'','description':'智能匹配，无需前缀标识<br>例如：<code>apple @CHN-BJ</code>'}
+                    ],
+                    'defaults':'设备搜索帮助提示'
+                },//*/
+                width:350,   /*提示框的宽度，缺省为输入框的宽度相同*/
+                topoffset: 6,  /*提示框与输入框的距离，缺省为5*/
+                style: 'list',
+                cssFile: 'css/search-suggest.css'
+
+            });
+
+
+            $("#default").searchSuggest({
+                //url: '', //*优先从url ajax 请求 json 帮助数据/
+                json:{
+                    'data':[
+                        {'id':'0','word':'bytes=','description':'根据服务器发给客户端访问数据量搜索；单位为 byte<br>例如，搜索数据量大概在 20-50K 之间的日志：<pre>bytes=[20000,50000]</pre>'},
+                        {'id':'1','word':'contenttype=','description':'根据内容类型进行搜索<br>例如：<pre>contenttype=image/jpeg</pre>'},
+                        {'id':'2','word':'cookie=','description':'根据客户端 Cookie 进行搜索<br>例如：<pre>cookie=user </pre>'},
+                        {'id':'3','word':'domain=','description':'根据域名搜索<br>例如：<pre>domain=chinacache.com </pre>提示：切割自请求 URL'},
+                        {'id':'4','word':'elapsed=','description':'请求耗时<br>例如：<pre>elapsed==1</pre>'},
+                        {'id':'5','word':'fccode=','description':'根据状态码进行搜索<br>例如：<pre>fccode=TCP_REFRESH_HIT/304</pre>'},
+                        {'id':'6','word':'ip=','description':'根据客户端 IP 搜索<br>例如，搜索客户端 IP 为 127.0.0.1 或包含 192.168 的日志：<pre>ip={127.0.0.1,192.168}</pre>'},
+                        {'id':'7','word':'method=','description':'根据客户端请求方式搜索<br>例如：<pre>method=GET<br>method=POST<br>method={GET,POST}</pre>'},
+                        {'id':'8','word':'param=','description':'通过 URL 中传的参数进行搜索<br>例如：<pre>param=username </pre>'},
+                        {'id':'9','word':'peerinfo=','description':'根据回源信息进行搜索<br>例如：<pre>peerinfo=DIRECT/1.202.150.137 </pre>回源信息字段包括下面的 Peercode 和 Peerhost'},
+                        {'id':'10','word':'peercode=','description':'通过回源代码进行搜索<br>例如：<pre>peercode=DIRECT </pre>注意：此为切割自 Peerinfo 字段'},
+                        {'id':'11','word':'peerhost=','description':'根据回源主机进行搜索<br>例如：<pre>peerhost=1.202.150.137 </pre>注意：此为切割自 Peerinfo 字段'},
+                        {'id':'12','word':'referer=','description':'根据来路域名搜索<br>例如：<pre>referer=baidu.com </pre>'},
+                        {'id':'13','word':'result=','description':'根据请求结果搜索<br>例如：<pre>result=TCP_MEM_HIT</pre>提示：为切割自 FC Code 字段'},
+                        {'id':'14','word':'scheme=','description':'根据协议搜索<br>例如：<pre>scheme=http </pre>提示：切割自请求 URL'},
+                        {'id':'15','word':'status=','description':'根据状态码进行搜索<br>例如：<pre>status=404 </pre>提示：为切割自 FC Code 字段'},
+                        {'id':'16','word':'ua=','description':'根据浏览器客户端的 User Agent 信息进行搜索<br>例如：<pre>ua=chrome </pre>'},
+                        {'id':'17','word':'uri=','description':'根据请求的 URI 搜索<br>例如：<pre>uri=login </pre>'},
+                        {'id':'18','word':'url=','description':'根据请求的 URL 搜索<br>例如，搜索 URL 包含 chinacache.com 域名的日志：<pre>url=chinacache.com </pre>提示：包括以下的Scheme、Domain、URI 及 Parameter'},
+                        {'id':'19','word':'username=','description':'按照客户端用户名搜索<br>例如：<pre>username=- </pre>提示：该字段一般为 - '}
+                    ],
+                    'defaults':'<b>日志搜索步骤</b><br>' +
+                                '1. 在右下角小窗口选定清单<br/>' +
+                                '2. 输入搜索条件查询<br>' +
+                                '3. 内容框载入最近 500 条信息，并在状态栏实时显示查询进度<br><br>' +
+                                '<b>搜索语法示例</b><br>' +
+                                '1. 模糊搜索：直接输入关键字<pre>chinacache.com</pre>' +
+                                '2. 集合的写法：<pre>foo={a,b,c}<br>foo!={a,b,c}</pre>' +
+                                '3. 区间的写法：<pre>foo=[x,y]<br>foo=(x,y)<br>foo=[x,] foo=[,y]</pre>' +
+                                '4. 精确匹配的写法：<pre>foo==a </pre>' +
+                                '5. 多条件的搜索：<pre>foo=a bar=b<br>foo=[x,y] bar={a,b} far!=c</pre>' +
+                                '<br>更多解释请参考: <a href="/help/index.html#log-search" target="_blank">帮助文档</a>'
+
+                },
+                width:380,   //提示框的宽度，缺省为输入框的宽度相同
+                topoffset: 16,  //*提示框与输入框的距离，缺省为5
+                style: 'default',
+                cssFile: 'css/search-suggest.css'
+
+            });
+        });
+    </script>
+
+    <link href="http://google-code-prettify.googlecode.com/svn/trunk/src/prettify.css" rel="stylesheet" type="text/css"/>
+    <script src="http://google-code-prettify.googlecode.com/svn/trunk/src/prettify.js" type="text/javascript"/></script>
+
+    <script type="text/javascript">
+    jQuery(document).ready(function(){
+        jQuery("pre").addClass("prettyprint linenums");
+        prettyPrint();   
+    })
+    </script>
+</body>
+</html>

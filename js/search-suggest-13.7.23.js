@@ -91,91 +91,80 @@ $('input').searchSuggest('destroy');
             } 
 
             /**通过ajax返回json格式数据生成用来创建dom的字符串**/
-            var render = function(parent, json,ddiv,opts) {
+            var render = function(parent, json) {
                 var res = json['data'] || json;
                 var appendStr = '<div class="content">';
                 //用json对象中内容替换模版字符串中匹配/\{([a-z]+)\}/ig的内容,如{word},{description} 
                 for (var i = 0; i < res.length; i += 1) {
-                    appendStr += opts.tpl.replace(/\{([a-z]+)\}/ig, function(m, n) {
+                    appendStr += options.tpl.replace(/\{([a-z]+)\}/ig, function(m, n) {
                         return res[i][n];
                     });
                 }
-                appendStr += '</div><div class="description">' + opts.json.defaults + '</div>';
-                jebind(parent, appendStr,ddiv,opts);
+                appendStr += '</div><div class="description">' + options.json.defaults + '</div>';
+                jebind(parent, appendStr);
             } 
 
             /**设置描述信息**/
-            var setDescription = function(ddiv,opts){
-                var ddiv = ddiv || dropDiv;
-                var opts = opts || options;
-
-                if(ddiv.html() == ''){
-                    ddiv.hide();
+            var setDescription = function(){
+                if(dropDiv.html() == ''){
+                    dropDiv.hide();
                     return;
                 }
-                var desc = ddiv.find('.description');
+                var desc = dropDiv.find('.description');
 
-                //console.log(opts);
+                //console.log(options);
                 //风格设置判断
-                if(opts.style == 'list'){ //每一行显示 word 及其描述
+                if(options.style == 'list'){ //每一行显示 word 及其描述
                     desc.hide();
-                    ddiv.find('.content').css({'width':'100%','border':'0'});
-                    ddiv.find('.content .list .word').css({'width':"49%"});
-                    ddiv.find('.desc').show();
+                    dropDiv.find('.content').css({'width':'100%','border':'0'});
+                    dropDiv.find('.content .list .word').css({'width':"49%"});
+                    dropDiv.find('.desc').show();
                     return;
-                }else if(opts.style == 'line'){ //只显示 word，一行一个
+                }else if(options.style == 'line'){ //只显示 word，一行一个
                     desc.hide();
-                    ddiv.find('.desc').hide();
-                    ddiv.find('.content').css({'width':'100%','border':'0'});
+                    dropDiv.find('.desc').hide();
+                    dropDiv.find('.content').css({'width':'100%','border':'0'});
                     return;
                 }
 
-                var selectedList = ddiv.find('.' + opts.listHoverCSS);
+                var selectedList = dropDiv.find('.' + options.listHoverCSS);
 
                 if(selectedList.length > 0){
                     var rel_id = selectedList.find('.word').attr('rel_id').split('_');
                     var index = rel_id[rel_id.length - 1];
-                    var de = opts.json.data[index].description;
+                    var de = options.json.data[index].description;
                 }else{
-                    var de = opts.json.defaults;
+                    var de = options.json.defaults;
                 }
                 
                 desc.html(de);
             }
 
             /**将新建dom对象插入到提示框中,并重新绑定mouseover事件监听**/
-            var jebind = function(parent, a, ddiv,opts){
-                var ddiv = ddiv || dropDiv;
-                var opts = opts || options;
-
-                ddiv.append(a);
-                setDescription(ddiv,opts);
-                ddiv.find('.list').each(function() {
+            var jebind = function(parent, a) {
+                dropDiv.append(a);
+                setDescription();
+                dropDiv.find('.list').each(function() {
                     $(this).unbind('mouseover').mouseover(function() {
-                        unHoverAll(ddiv,opts);
-                        $(this).addClass(opts.listHoverCSS);
-                        console.log('setDescription');
-                        console.log(opts);
-                        console.log($(this));
-                        setDescription(ddiv,opts);
+                        unHoverAll();
+                        $(this).addClass(options.listHoverCSS);
+                        setDescription();
                     }).unbind('click').click(function() {
                         var inputValList = parent.val().split(' ');
                         inputValList[inputValList.length - 1] = getPointWord($(this));
                         parent.val(inputValList.join(' '));
-                        //ddiv.empty().hide();
+                        //dropDiv.empty().hide();
                         parent.focus();
                     });
                 });
             } 
 
             /**将提示框中所有列的hover样式去掉**/
-            var unHoverAll = function(ddiv,opts){
-                var ddiv = ddiv || dropDiv;
-                var opts = opts || options;
-
-                ddiv.find('.' + opts.listHoverCSS).removeClass(opts.listHoverCSS);
-                
-                setDescription(ddiv,opts);
+            var unHoverAll = function() {
+                dropDiv.find('.list').each(function() {
+                    $(this).removeClass(options.listHoverCSS);
+                });
+                setDescription();
             } 
 
             /**在提示框中取得当前选中的提示关键字**/
@@ -184,45 +173,39 @@ $('input').searchSuggest('destroy');
             } 
 
             /**刷新提示框,并设定样式**/
-            var refreshDropDiv = function(parent, json,ddiv,opts){
-                var ddiv = ddiv || dropDiv;
-                var opts = opts || options;
-
+            var refreshDropDiv = function(parent, json) {
                 json = validData = processData(json);
 
                 if(!validData || json.data.length == 0){
-                    ddiv.hide();
+                    dropDiv.hide();
                     return false;
                 }
 
                 var left = parent.offset().left;
                 var height = parent.height();
-                var top = parent.offset().top + opts.topoffset + height;
-                var width = opts.width || parent.width() + 'px';
-                ddiv.empty();
-                ddiv.css({
+                var top = parent.offset().top + options.topoffset + height;
+                var width = options.width || parent.width() + 'px';
+                dropDiv.empty();
+                dropDiv.css({
                     'left': left,
                     'top': top,
                     'width': width
                 });
-                render(parent, json,ddiv,opts);
+                render(parent, json);
                 //防止ajax返回之前输入框失去焦点导致提示框不消失 
                 parent.focus();
-                ddiv.fadeIn(500);
+                dropDiv.fadeIn(500);
             } 
 
             /**通过 ajax 或 json 参数获取数据**/
-            var getData = function(word, parent, callback, ddiv, opts) {
+            var getData = function(word, parent, callback) {
                 var json;
-                var ddiv = ddiv || dropDiv;
-                var opts = opts || options;
-
 
                 /**给了url参数，则从服务器 ajax 请求帮助的 json **/
-                console.log(opts.url + word);
-                if(opts.url != null){
-                    var hyphen = opts.url.indexOf('?') != -1 ? '&' : "?"; //简单判断，如果url已经存在？，则jsonp的连接符应该为&
-                    var URL = opts.jsonp ? [opts.url+word, hyphen, opts.jsonp, '=?'].join('') : opts.url + word; //开启jsonp，则修订url，不可以用param传递，？会被编码为%3F
+                console.log(options.url + word);
+                if(options.url != null){
+                    var hyphen = options.url.indexOf('?') != -1 ? '&' : "?"; //简单判断，如果url已经存在？，则jsonp的连接符应该为&
+                    var URL = options.jsonp ? [options.url+word, hyphen, options.jsonp, '=?'].join('') : options.url + word; //开启jsonp，则修订url，不可以用param传递，？会被编码为%3F
                     $.ajax({
                         type: 'GET',
                         /*data: "word=" + word,*/
@@ -231,28 +214,26 @@ $('input').searchSuggest('destroy');
                         timeout: 3000,
                         success: function(data) {
 
-                            callback(parent, data, ddiv, opts); //为 refreshDropDiv
+                            callback(parent, data);
 
                         },
                         error: handleError
                     });
                 }else{
                     /**没有给出url 参数，则从 json 参数获取或自行构造json帮助内容 **/
-                    json = opts.json;
+                    json = options.json;
 
-                    callback(parent, json, ddiv, opts);
+                    callback(parent, json);
                 }//else
 
                 return;
             }
             
             /** url 获取数据时，对数据的处理，作为 getData 的回调函数 **/
-            var processData = function(json,opts){
-                var opts = opts || options;
-
+            var processData = function(json){
                 validData = checkData(json);
                 //url 请求的数据
-                if(!opts.url) return validData;
+                if(!options.url) return validData;
 
                 //本地的 json 数据
                 if(validData && $.trim(word) != ''){ //输入不为空时则进行匹配
@@ -320,13 +301,12 @@ $('input').searchSuggest('destroy');
                     ],
                     'defaults':'http://lzw.me'
                 },
-                style: 'default',   //风格样式，[line,list,default]
+                style: 'default',
                 cssFile: '/our/css/search-suggest.css',
                 listHoverCSS: 'jhover', //提示框列表鼠标悬浮的样式
                 tpl: '<div class="list"><div class="word" rel_id="st_{id}">{word}</div><div class="desc">{description}</div></div>',
-                //行模板
-                processData: processData, //格式化数据的方法
-                getData: getData,  //获取数据的方法
+                processData: null, //格式化数据的方法
+                getData: null,  //获取数据的方法
                 topoffset: 5,
                 keyLeft: 37,    //向左方向键
                 keyUp: 38,      //向上方向键
@@ -377,10 +357,10 @@ $('input').searchSuggest('destroy');
                                 tipsWord = getPointWord(dropDiv.find('.list:first').mouseover());
                             } else if (currentList.next().length == 0) {
                                 //如果是最后一个被选中,则取消选中,即可认为是输入框被选中，并恢复输入的值
-                                unHoverAll(dropDiv,options);
+                                unHoverAll();
                                 $(this).val($(this).attr('alt'));
                             } else {
-                                unHoverAll(dropDiv,options);
+                                unHoverAll();
                                 //将原先选中列的下一列选中 
                                 if (currentList.next().length != 0) 
                                     tipsWord = getPointWord(currentList.next().mouseover());
@@ -389,11 +369,11 @@ $('input').searchSuggest('destroy');
                             if (currentList.length == 0) {
                                 tipsWord = getPointWord(dropDiv.find('.list:last').mouseover());
                             } else if (currentList.prev().length == 0) {
-                                unHoverAll(dropDiv,options);
+                                unHoverAll();
                                 $(this).val($(this).attr('alt'));
 
                             } else {
-                                unHoverAll(dropDiv,options);
+                                unHoverAll();
                                 if (currentList.prev().length != 0)
                                     tipsWord = getPointWord(currentList.prev().mouseover());
                             }
