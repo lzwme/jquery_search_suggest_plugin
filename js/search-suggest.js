@@ -174,6 +174,13 @@ $('input').searchSuggest('destroy');
 
             /**刷新提示框,并设定样式**/
             var refreshDropDiv = function(parent, json) {
+                json = validData = processData(json);
+
+                if(!validData || json.data.length == 0){
+                    dropDiv.hide();
+                    return false;
+                }
+
                 var left = parent.offset().left;
                 var height = parent.height();
                 var top = parent.offset().top + options.topoffset + height;
@@ -187,11 +194,11 @@ $('input').searchSuggest('destroy');
                 render(parent, json);
                 //防止ajax返回之前输入框失去焦点导致提示框不消失 
                 parent.focus();
+                dropDiv.fadeIn(500);
             } 
 
             /**通过 ajax 或 json 参数获取数据**/
-            var getData = function(parent, word) {
-                var validData = false;
+            var getData = function(word, parent, callback) {
                 var json;
 
                 /**给了url参数，则从服务器 ajax 请求帮助的 json **/
@@ -206,50 +213,46 @@ $('input').searchSuggest('destroy');
                         dataType: 'json',
                         timeout: 3000,
                         success: function(data) {
-                            json = validData = processData(data);
 
-                            if(validData && json.data.length > 0){
-                                dropDiv.fadeIn(500,refreshDropDiv(parent, json));
-                            }else{
-                                dropDiv.hide();
-                            }
+                            callback(parent, data);
+
                         },
                         error: handleError
                     });
                 }else{
                     /**没有给出url 参数，则从 json 参数获取或自行构造json帮助内容 **/
                     json = options.json;
-                    validData = checkData(json);
 
-                    if(validData && $.trim(word) != ''){ //输入不为空时则进行匹配
-                        var jsonStr = "{'data':[";
-                        for (var i = json.data.length - 1; i >= 0; i--) {
-                           if(json.data[i].word.indexOf(word) != -1 || word.indexOf(json.data[i].word) != -1){
-                                jsonStr += "{'id':'" + json.data[i].id 
-                                    + "','word':'"+ json.data[i].word
-                                    + "', 'description': '" + json.data[i].description 
-                                    + "'},";
-                            }
-                        };
-                        jsonStr += "],'defaults':'" + json.defaults + "'}";
-                        //alert(jsonStr);
-                        //json = json2;//JSON.parse(json2);
-                        //字符串转化为 js 对象
-                        json = (new Function("return "+jsonStr ))();
-                    }
-                    if(validData && json.data.length > 0){
-                        dropDiv.fadeIn(500,refreshDropDiv(parent, json));
-                    }else{
-                        dropDiv.hide();
-                    }
+                    callback(parent, json);
                 }//else
 
                 return;
             }
             
-            /** url 获取数据时，对数据的处理，一般可由客户端来处理 **/
+            /** url 获取数据时，对数据的处理，作为 getData 的回调函数 **/
             var processData = function(json){
-                return checkData(json);
+                validData = checkData(json);
+                //url 请求的数据
+                if(!options.url) return validData;
+
+                //本地的 json 数据
+                if(validData && $.trim(word) != ''){ //输入不为空时则进行匹配
+                    var jsonStr = "{'data':[";
+                    for (var i = json.data.length - 1; i >= 0; i--) {
+                       if(json.data[i].word.indexOf(word) != -1 || word.indexOf(json.data[i].word) != -1){
+                            jsonStr += "{'id':'" + json.data[i].id 
+                                + "','word':'"+ json.data[i].word
+                                + "', 'description': '" + json.data[i].description 
+                                + "'},";
+                        }
+                    };
+                    jsonStr += "],'defaults':'" + json.defaults + "'}";
+                    //alert(jsonStr);
+                    //json = json2;//JSON.parse(json2);
+                    //字符串转化为 js 对象
+                    json = (new Function("return "+jsonStr ))();
+                }
+                return json;
             }
 
             /**检测 ajax 返回成功数据或 json 参数数据是否有效**/
@@ -292,11 +295,11 @@ $('input').searchSuggest('destroy');
                 jsonp: null, //设置此参数名，将开启jsonp功能，否则使用json数据结构
                 json: {
                     'data':[
-                        {'id':'0','word':'23322111','description':'11'},
-                        {'id':'1','word':'c22cc','description':'22'},
-                        {'id':'2','word':'31133','description':'22'}
+                        {'id':'0','word':'lzw.me','description':'http://lzw.me'},
+                        {'id':'1','word':'w1.lzw.me','description':'http://w1.lzw.me'},
+                        {'id':'2','word':'g.lzw.me','description':'http://g.lzw.me'}
                     ],
-                    'defaults':'默认的描述'
+                    'defaults':'http://lzw.me'
                 },
                 style: 'default',
                 cssFile: '/our/css/search-suggest.css',
@@ -318,7 +321,7 @@ $('input').searchSuggest('destroy');
             }
 
             if($.isFunction(options.getData)){
-                processData = options.getData;
+                getData = options.getData;
             }
 
             //是否已经初始化的检测
@@ -396,7 +399,7 @@ $('input').searchSuggest('destroy');
                     if ($(this).val() != '' && $(this).val() == $(this).attr('alt')) return;
 
                     var words = $(this).val().split(' ');
-                    getData( $this, words[words.length-1]);
+                    getData( words[words.length-1], $this, refreshDropDiv);
                 }).bind('blur', function() {
                     if (isOver && dropDiv.find('.' + options.listHoverCSS) != 0) return;
                     //文本输入框失去焦点则清空并隐藏提示层 
@@ -405,7 +408,7 @@ $('input').searchSuggest('destroy');
                     if ($(this).val() != '' && $(this).val() == $(this).attr('alt') || dropDiv.css('display') != 'none') return;
 
                     var words = $(this).val().split(' ');
-                    getData( $this, words[words.length-1]);
+                    getData( words[words.length-1], $this, refreshDropDiv);
                     //setDescription();
                 });
 
