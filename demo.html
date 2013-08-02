@@ -130,6 +130,240 @@
                 topoffset: 6,  /*提示框与输入框的距离，缺省为5*/
                 style: 'list',
                 cssFile: 'css/search-suggest.css'
+            });
+
+            $("#list_progress").searchSuggest({
+                //url: 'http://localhost/tips/ajax?method=getsearchhelp', /*优先从url ajax 请求 json 帮助数据*/
+                json:{
+                    'data':[
+                        {'id':'0','word':'@','description':'根据设备名（或前缀）搜索<br>例如：<code>@CNC-BJ</code>'},
+                        {'id':'1','word':'~','description':'根据应用名称搜索<br>例如：<code>~FSCS</code>'},
+                        {'id':'2','word':'#','description':'根据频道名称搜索<br>例如：<code>#chinacache.com</code>'},
+                        {'id':'3','word':'/','description':'根据 MRTG 标注搜索<br>例如：<code>/apple</code>'},
+                        {'id':'4','word':'','description':'智能匹配，无需前缀标识<br>例如：<code>apple @CHN-BJ</code>'}
+                    ],
+                    'defaults':'设备搜索帮助提示'
+                },
+                width:350,   /*提示框的宽度，缺省为输入框的宽度相同*/
+                topoffset: 6,  /*提示框与输入框的距离，缺省为5*/
+                style: 'list',
+                cssFile: 'css/search-suggest.css',
+                getData: function(word, parent, callback,ddiv,opts) {//数据获取方法
+                    //if(!word) return;
+                    console.log(word);
+                    var data;
+                    var json;
+                    switch (word){
+                        case '':
+                            data = opts.json;
+                            break;
+                        case '@': //设备前缀搜索方式，请求一级前缀
+                            //一级数据构造
+                            var str="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                            var jsonStr = "{'data':[";
+                            for (var i = 0; i < str.length; i++) {
+                                for(var j = 0; j < 3; j++){
+                                    jsonStr += "{'id':'" + i 
+                                        + "','word':'"+ word + str[i] + str[(i+1)%str.length] + str[(i+2)%str.length]
+                                        + "', 'description': '" + str[i]+ str[(i+1)%str.length] + str[(i+2)%str.length]
+                                        + "'},";
+                                }
+                            }
+                            jsonStr += "],'defaults':''}";
+                            
+                            //字符串转化为 js 对象
+                            opts.devdata = data = (new Function("return "+jsonStr ))();
+                            break;
+                        case '~': //为应用名称搜索，请求应用名称数据
+                            //一级数据构造
+                            var str="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                            var jsonStr = "{'data':[";
+                            for (var i = 0; i < str.length; i++) {
+                                for(var j = 0; j < 3; j++){
+                                    jsonStr += "{'id':'" + i 
+                                        + "','word':'"+ word + str[i] + str[(i+1)%str.length] + str[(i+2)%str.length]
+                                        + "', 'description': '" + str[i]+ str[(i+1)%str.length] + str[(i+2)%str.length]
+                                        + "'},";
+                                }
+                            }
+                            jsonStr += "],'defaults':''}";
+                            
+                            //字符串转化为 js 对象
+                            opts.appdata = data = (new Function("return "+jsonStr ))();
+                            break;
+                        default:
+                            if(word[0] == '@'){//为设备前缀搜索
+                                if(word[word.length -1] == '-'){ //二级的请求开始
+                                    //数据构造
+                                    var str="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                                    var jsonStr = "{'data':[";
+                                    for (var i = 0; i < str.length; i++) {
+                                        for(var j = 0; j < 3; j++){
+                                            jsonStr += "{'id':'" + i 
+                                                + "','word':'"+ word + str[i] + str[(i+1)%str.length] + str[(i+2)%str.length]
+                                                + "', 'description': '" + word
+                                                + "'},";
+                                        }
+                                    }
+                                    jsonStr += "],'defaults':''}";
+                                    
+                                    //字符串转化为 js 对象
+                                    opts.devdata = data = (new Function("return "+jsonStr ))();
+                                }else{ //在上一次请求中查询
+                                    json = opts.devdata;
+                                    var jsonStr = "{'data':[";
+                                    for (var i = json.data.length - 1; i >= 0; i--) {
+                                       if(json.data[i].word.indexOf(word) != -1 || word.indexOf(json.data[i].word) != -1){
+                                            jsonStr += "{'id':'" + json.data[i].id 
+                                                + "','word':'"+ json.data[i].word
+                                                + "', 'description': '" + json.data[i].description 
+                                                + "'},";
+                                        }
+                                    };
+                                    jsonStr += "],'defaults':'" + json.defaults + "'}";
+                                    
+                                    //字符串转化为 js 对象
+                                    data = (new Function("return "+jsonStr ))();
+                                }
+
+                                break;
+                            }
+
+                            if(word[0] == '~'){ //应用名搜索，在已请求数据中查询
+                                json = opts.appdata;
+                                var jsonStr = "{'data':[";
+                                for (var i = json.data.length - 1; i >= 0; i--) {
+                                   if(json.data[i].word.indexOf(word) != -1 || word.indexOf(json.data[i].word) != -1){
+                                        jsonStr += "{'id':'" + json.data[i].id 
+                                            + "','word':'"+ json.data[i].word
+                                            + "', 'description': '" + json.data[i].description 
+                                            + "'},";
+                                    }
+                                };
+                                jsonStr += "],'defaults':'" + json.defaults + "'}";
+                                
+                                //字符串转化为 js 对象
+                                data = (new Function("return "+jsonStr ))(); 
+
+                                break;
+                            }
+
+                            //其他情况下，在 json 中查询
+                            json = opts.json;
+                            var jsonStr = "{'data':[";
+                            for (var i = json.data.length - 1; i >= 0; i--) {
+                               if(json.data[i].word.indexOf(word) != -1 || word.indexOf(json.data[i].word) != -1){
+                                    jsonStr += "{'id':'" + json.data[i].id 
+                                        + "','word':'"+ json.data[i].word
+                                        + "', 'description': '" + json.data[i].description 
+                                        + "'},";
+                                }
+                            };
+                            jsonStr += "],'defaults':'" + json.defaults + "'}";
+                            
+                            //字符串转化为 js 对象
+                            data = (new Function("return "+jsonStr ))();
+
+                    }
+                /*
+                    if(word=='' || word[0] != '@'){// word 为空、或开头字符不是 @
+                        data = opts.json;
+                        if(word != ''){
+                            json = opts.json;
+                            var jsonStr = "{'data':[";
+                            for (var i = json.data.length - 1; i >= 0; i--) {
+                               if(json.data[i].word.indexOf(word) != -1 || word.indexOf(json.data[i].word) != -1){
+                                    jsonStr += "{'id':'" + json.data[i].id 
+                                        + "','word':'"+ json.data[i].word
+                                        + "', 'description': '" + json.data[i].description 
+                                        + "'},";
+                                }
+                            };
+                            jsonStr += "],'defaults':'" + json.defaults + "'}";
+                            
+                            //字符串转化为 js 对象
+                            data = (new Function("return "+jsonStr ))();
+                        }
+                    }else if( '@~#/'.indexOf(word) != -1){
+                        //一级关键字触发，请求一次
+                        /*
+                        opts.devdata=data = {
+                            'data':[
+                                {'id':'0','word':'@CNC','description':'网通网络设备'},
+                                {'id':'1','word':'@CHN','description':'CHN'},
+                                {'id':'2','word':'@CHT','description':'CHT'},
+                                {'id':'3','word':'@CCN','description':'CCN'},
+                                {'id':'4','word':'@CMN','description':'CMN'}
+                            ],
+                            'defaults':'设备搜索帮助提示'
+                        };///
+                        //数据构造
+                        var str="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                        var jsonStr = "{'data':[";
+                        for (var i = 0; i < str.length; i++) {
+                            for(var j = 0; j < 3; j++){
+                                jsonStr += "{'id':'" + i 
+                                    + "','word':'"+ word + str[i] + str[(i+1)%str.length] + str[(i+2)%str.length]
+                                    + "', 'description': '" + str[i]+ str[(i+1)%str.length] + str[(i+2)%str.length]
+                                    + "'},";
+                            }
+                        }
+                        jsonStr += "],'defaults':''}";
+                        
+                        //字符串转化为 js 对象
+                        opts.devdata = data = (new Function("return "+jsonStr ))();
+
+                    }else if((word[word.length-1]) == '-'){
+                        //二级关键字触发,请求一次
+                        /*
+                        opts.devdata = data = {
+                            'data':[
+                                {'id':'0','word':'@CNC-BJ','description':'北京网通网络设备'},
+                                {'id':'1','word':'@CHN-SH','description':'CHN'},
+                                {'id':'2','word':'@CHT-TJ','description':'CHT'},
+                                {'id':'3','word':'@CCN-SH','description':'上海网通网络设备'},
+                                {'id':'4','word':'@CMN-SH','description':'上海网通网络设备'},
+                                {'id':'5','word':'@CMN-SH','description':'上海网通网络设备'},
+                                {'id':'6','word':'@CMN-SH','description':'上海网通网络设备'}
+                            ],
+                            'defaults':'设备搜索帮助提示'
+                        };/
+                        //数据构造
+                        var str="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                        var jsonStr = "{'data':[";
+                        for (var i = 0; i < str.length; i++) {
+                            for(var j = 0; j < 3; j++){
+                                jsonStr += "{'id':'" + i 
+                                    + "','word':'"+ word + str[i] + str[(i+1)%str.length] + str[(i+2)%str.length]
+                                    + "', 'description': '" + str[i]+ str[(i+1)%str.length] + str[(i+2)%str.length]
+                                    + "'},";
+                            }
+                        }
+                        jsonStr += "],'defaults':''}";
+                        
+                        //字符串转化为 js 对象
+                        opts.devdata = data = (new Function("return "+jsonStr ))();
+
+                    }else{//否则在已请求的数据中检索
+                        json = opts.devdata;
+                        var jsonStr = "{'data':[";
+                        for (var i = json.data.length - 1; i >= 0; i--) {
+                           if(json.data[i].word.indexOf(word) != -1 || word.indexOf(json.data[i].word) != -1){
+                                jsonStr += "{'id':'" + json.data[i].id 
+                                    + "','word':'"+ json.data[i].word
+                                    + "', 'description': '" + json.data[i].description 
+                                    + "'},";
+                            }
+                        }
+                        jsonStr += "],'defaults':'" + json.defaults + "'}";
+                        
+                        //字符串转化为 js 对象
+                        data = (new Function("return "+jsonStr ))();
+                    }
+                    console.log(data);
+                */
+                    callback(parent,data,ddiv,opts);
+                }
 
             });
 
@@ -181,10 +415,11 @@
         });
     </script>
     </head>
-    <body>
-        百度搜索建议：&nbsp;&nbsp;<input type="text" size="50" id="baidu_line" /><br>
-        淘宝搜索建议：&nbsp;&nbsp;<input type="text" size="50" id="taobao_list" /><br>
-        自定义list风格：<input type="text" size="50" id="list" /><br>
-        自定义默认风格：<input type="text" size="50" id="default" />
+    <body style="width:700px; margin:auto">
+        自定义list风格：&nbsp;&nbsp;<input type="text" size="50" id="list" autocomplete="off" /><br>
+        list风格(渐进式)：<input type="text" size="50" id="list_progress" autocomplete="off" /><br>
+        自定义默认风格：&nbsp;&nbsp;<input type="text" size="50" id="default" autocomplete="off" /><br>
+        百度搜索建议：&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" size="50" id="baidu_line" autocomplete="off" /><br>
+        淘宝搜索建议：&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" size="50" id="taobao_list" autocomplete="off" />
     </body>
 </html>

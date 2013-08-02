@@ -2,12 +2,12 @@
 <html lang="zh-cn">
 <head>
     <meta charset=utf-8>
-    <!--base url='http://lzw.me'-->
+    <!--base href='http://lzw.me/pages/demo/jquery_search_suggest_plugin/'-->
     <title>搜索建议自动智能提示 jQuery 插件使用效果示例</title>
     <meta name="keywords" content="搜索建议,智能提示,搜索框提示,jQuery 插件">
     <meta name="description" content="由志文工作室开发的搜索建议 jQuery 插件，提供三种主要显示风格">
-    <link href="css/bootstrap.css" rel="stylesheet">
-    <link href="css/bootstrap-responsive.css"  rel="stylesheet">
+    <link href="./css/bootstrap.css" rel="stylesheet">
+    <link href="./css/bootstrap-responsive.css"  rel="stylesheet">
     <style type="text/css">
       body {
         padding-top: 60px;
@@ -36,18 +36,21 @@
             <div class="well nav-sider">
                 <ul class="nav nav-list">
                     <li class="nav-header"><i class="icon-home"></i>实用工具</li>
-                    <li><a href="/pages/unicode/" target="_blank"><i class="icon-tag"></i>unicode 字符编/解码</a></li>
-                    <li><a href="/pages/htmljs/" target="_blank"><i class="icon-tag"></i>HTML/Js 转换</a></li>
-                    <li><a href="/pages/jsbeautify/" target="_blank"><i class="icon-tag"></i>js格式化/解压缩</a></li>
-                    <li><a href="/pages/jspacker/" target="_blank"><i class="icon-tag"></i>js压缩/代码混淆</a></li>
-                    <li><a href="/pages/utf8/" target="_blank"><i class="icon-tag"></i>中文UTF8编码转换</a></li>
-                    <li><a href="/pages/qrcode/" target="_blank"><i class="icon-tag"></i>二维码在线生成工具</a></li>
-                    <li><a href="/pages/csscompressor/" target="_blank"><i class="icon-tag"></i>CSS 格式化工具</a></li>
+                    <li><a href="http://lzw.me/pages/unicode/" target="_blank"><i class="icon-tag"></i>unicode 字符编/解码</a></li>
+                    <li><a href="http://lzw.me/pages/utf8/" target="_blank"><i class="icon-tag"></i>中文 UTF8 编码转换</a></li>
+                    <li><a href="http://lzw.me/pages/jsbeautify/" target="_blank"><i class="icon-tag"></i>JS 格式化/解压缩</a></li>
+                    <li><a href="http://lzw.me/pages/jspacker/" target="_blank"><i class="icon-tag"></i>JS 压缩/代码混淆</a></li>
+                    <li><a href="http://lzw.me/pages/jseval/" target="_blank"><i class="icon-tag"></i>js eval 方式加密</a></li>
+                    <li><a href="http://lzw.me/pages/csscompressor/" target="_blank"><i class="icon-tag"></i>CSS 格式化工具</a></li>
+                    <li><a href="http://lzw.me/pages/htmljs/" target="_blank"><i class="icon-tag"></i>HTML/Js 转换</a></li>
+                    <li><a href="http://lzw.me/pages/10codeconversion/" target="_blank"><i class="icon-tag"></i>代码转换</a></li>
+                    <li><a href="http://lzw.me/pages/qrcode/" target="_blank"><i class="icon-tag"></i>二维码在线生成工具</a></li>
                 </ul>
                 <ul class="nav nav-list">
                     <li class="nav-header"><i class="icon-home"></i>实用手册</li>
                     <li><a href="/w3school/" target="_blank"><i class="icon-tag"></i>W3school</a></li>
-                    <li><a href="/pages/css3/" target="_blank"><i class="icon-tag"></i>CSS3在线</a></li>
+                    <li><a href="http://lzw.me/pages/css3/" target="_blank"><i class="icon-tag"></i>CSS3 在线</a></li>
+                    <li><a href="http://lzw.me/pages/ecmascript/" target="_blank"><i class="icon-tag"></i>ECMAscript</a></li>
                 </ul>
             </div>
         </div>        <!--//侧边栏-->
@@ -67,6 +70,10 @@
                         <tr>
                             <td>自定义list风格</td>
                             <td><input type="text" size="50" id="list" autocomplete="off" /></td>
+                        </tr>
+                        <tr>
+                            <td>list风格(渐进)</td>
+                            <td><input type="text" size="50" id="list_progress" autocomplete="off" /></td>
                         </tr>
                         <tr>
                             <td>百度搜索建议</td>
@@ -319,12 +326,12 @@ getData: getData,       //获取数据的方法，默认以插件定义为准
 
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
     <script>
-    !window.jQuery && document.write('<script src="js/jquery-1.9.1.min.js"><\/script>');
+    !window.jQuery && document.write('<script src="./js/jquery-1.9.1.min.js"><\/script>');
     </script>
     <!--script type='text/javascript' src='http://code.jquery.com/jquery.min.js?ver=1'></script-->
-    <script src="js/bootstrap.js"></script>
+    <script src="./js/bootstrap.js"></script>
 
-    <script type="text/javascript" src="js/search-suggest.js"></script>
+    <script type="text/javascript" src="./js/search-suggest.js"></script>
 
 
     <script type="text/javascript">
@@ -449,6 +456,144 @@ getData: getData,       //获取数据的方法，默认以插件定义为准
                 topoffset: 6,  /*提示框与输入框的距离，缺省为5*/
                 style: 'list',
                 cssFile: 'css/search-suggest.css'
+
+            });
+
+            $("#list_progress").searchSuggest({
+                //url: 'http://localhost/tips/ajax?method=getsearchhelp', /*优先从url ajax 请求 json 帮助数据*/
+                json:{
+                    'data':[
+                        {'id':'0','word':'@','description':'根据设备名（或前缀）搜索<br>例如：<code>@CNC-BJ</code>'},
+                        {'id':'1','word':'~','description':'根据应用名称搜索<br>例如：<code>~FSCS</code>'},
+                        {'id':'2','word':'#','description':'根据频道名称搜索<br>例如：<code>#chinacache.com</code>'},
+                        {'id':'3','word':'/','description':'根据 MRTG 标注搜索<br>例如：<code>/apple</code>'},
+                        {'id':'4','word':'','description':'智能匹配，无需前缀标识<br>例如：<code>apple @CHN-BJ</code>'}
+                    ],
+                    'defaults':'设备搜索帮助提示'
+                },
+                width:350,   /*提示框的宽度，缺省为输入框的宽度相同*/
+                topoffset: 6,  /*提示框与输入框的距离，缺省为5*/
+                style: 'list',
+                cssFile: 'css/search-suggest.css',
+                getData: function(word, parent, callback,ddiv,opts) {//数据获取方法
+                    //if(!word) return;
+                    console.log(word);
+                    var data;
+                    var json;
+                    switch (word){
+                        case '':
+                            data = opts.json;
+                            break;
+                        case '@': //设备前缀搜索方式，请求一级前缀
+                            //一级数据构造
+                            var str="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                            var jsonStr = "{'data':[";
+                            for (var i = 0; i < str.length; i++) {
+                                for(var j = 0; j < 3; j++){
+                                    jsonStr += "{'id':'" + i 
+                                        + "','word':'"+ word + str[i] + str[(i+1)%str.length] + str[(i+2)%str.length]
+                                        + "', 'description': '" + str[i]+ str[(i+1)%str.length] + str[(i+2)%str.length]
+                                        + "'},";
+                                }
+                            }
+                            jsonStr += "],'defaults':''}";
+                            
+                            //字符串转化为 js 对象
+                            opts.devdata = data = (new Function("return "+jsonStr ))();
+                            break;
+                        case '~': //为应用名称搜索，请求应用名称数据
+                            //一级数据构造
+                            var str="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                            var jsonStr = "{'data':[";
+                            for (var i = 0; i < str.length; i++) {
+                                for(var j = 0; j < 3; j++){
+                                    jsonStr += "{'id':'" + i 
+                                        + "','word':'"+ word + str[i] + str[(i+1)%str.length] + str[(i+2)%str.length]
+                                        + "', 'description': '" + str[i]+ str[(i+1)%str.length] + str[(i+2)%str.length]
+                                        + "'},";
+                                }
+                            }
+                            jsonStr += "],'defaults':''}";
+                            
+                            //字符串转化为 js 对象
+                            opts.appdata = data = (new Function("return "+jsonStr ))();
+                            break;
+                        default:
+                            if(word[0] == '@'){//为设备前缀搜索
+                                if(word[word.length -1] == '-'){ //二级的请求开始
+                                    //数据构造
+                                    var str="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                                    var jsonStr = "{'data':[";
+                                    for (var i = 0; i < str.length; i++) {
+                                        for(var j = 0; j < 3; j++){
+                                            jsonStr += "{'id':'" + i 
+                                                + "','word':'"+ word + str[i] + str[(i+1)%str.length] + str[(i+2)%str.length]
+                                                + "', 'description': '" + word
+                                                + "'},";
+                                        }
+                                    }
+                                    jsonStr += "],'defaults':''}";
+                                    
+                                    //字符串转化为 js 对象
+                                    opts.devdata = data = (new Function("return "+jsonStr ))();
+                                }else{ //在上一次请求中查询
+                                    json = opts.devdata;
+                                    var jsonStr = "{'data':[";
+                                    for (var i = json.data.length - 1; i >= 0; i--) {
+                                       if(json.data[i].word.indexOf(word) != -1 || word.indexOf(json.data[i].word) != -1){
+                                            jsonStr += "{'id':'" + json.data[i].id 
+                                                + "','word':'"+ json.data[i].word
+                                                + "', 'description': '" + json.data[i].description 
+                                                + "'},";
+                                        }
+                                    };
+                                    jsonStr += "],'defaults':'" + json.defaults + "'}";
+                                    
+                                    //字符串转化为 js 对象
+                                    data = (new Function("return "+jsonStr ))();
+                                }
+
+                                break;
+                            }
+
+                            if(word[0] == '~'){ //应用名搜索，在已请求数据中查询
+                                json = opts.appdata;
+                                var jsonStr = "{'data':[";
+                                for (var i = json.data.length - 1; i >= 0; i--) {
+                                   if(json.data[i].word.indexOf(word) != -1 || word.indexOf(json.data[i].word) != -1){
+                                        jsonStr += "{'id':'" + json.data[i].id 
+                                            + "','word':'"+ json.data[i].word
+                                            + "', 'description': '" + json.data[i].description 
+                                            + "'},";
+                                    }
+                                };
+                                jsonStr += "],'defaults':'" + json.defaults + "'}";
+                                
+                                //字符串转化为 js 对象
+                                data = (new Function("return "+jsonStr ))(); 
+
+                                break;
+                            }
+
+                            //其他情况下，在 json 中查询
+                            json = opts.json;
+                            var jsonStr = "{'data':[";
+                            for (var i = json.data.length - 1; i >= 0; i--) {
+                               if(json.data[i].word.indexOf(word) != -1 || word.indexOf(json.data[i].word) != -1){
+                                    jsonStr += "{'id':'" + json.data[i].id 
+                                        + "','word':'"+ json.data[i].word
+                                        + "', 'description': '" + json.data[i].description 
+                                        + "'},";
+                                }
+                            };
+                            jsonStr += "],'defaults':'" + json.defaults + "'}";
+                            
+                            //字符串转化为 js 对象
+                            data = (new Function("return "+jsonStr ))();
+
+                    }
+                    callback(parent,data,ddiv,opts);
+                }
 
             });
 

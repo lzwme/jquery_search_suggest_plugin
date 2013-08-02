@@ -74,7 +74,7 @@ $('input').searchSuggest('destroy');
             return methods.init.apply(this, arguments);
         }
 
-    }
+    };
 
     //方法列表
     var methods = {
@@ -84,11 +84,11 @@ $('input').searchSuggest('destroy');
             /**处理ajax失败的方法**/
             var handleError = function(error) {
                 showError("url错误或超时，请求失败!"); 
-            }
+            };
             var showError = function(error) {
                 //alert(error);
                 console.log(error);
-            } 
+            };
 
             /**通过ajax返回json格式数据生成用来创建dom的字符串**/
             var render = function(parent, json,ddiv,opts) {
@@ -102,7 +102,7 @@ $('input').searchSuggest('destroy');
                 }
                 appendStr += '</div><div class="description">' + opts.json.defaults + '</div>';
                 jebind(parent, appendStr,ddiv,opts);
-            } 
+            };
 
             /**设置描述信息**/
             var setDescription = function(ddiv,opts){
@@ -115,7 +115,6 @@ $('input').searchSuggest('destroy');
                 }
                 var desc = ddiv.find('.description');
 
-                //console.log(opts);
                 //风格设置判断
                 if(opts.style == 'list'){ //每一行显示 word 及其描述
                     desc.hide();
@@ -141,7 +140,7 @@ $('input').searchSuggest('destroy');
                 }
                 
                 desc.html(de);
-            }
+            };
 
             /**将新建dom对象插入到提示框中,并重新绑定mouseover事件监听**/
             var jebind = function(parent, a, ddiv,opts){
@@ -154,9 +153,6 @@ $('input').searchSuggest('destroy');
                     $(this).unbind('mouseover').mouseover(function() {
                         unHoverAll(ddiv,opts);
                         $(this).addClass(opts.listHoverCSS);
-                        console.log('setDescription');
-                        console.log(opts);
-                        console.log($(this));
                         setDescription(ddiv,opts);
                     }).unbind('click').click(function() {
                         var inputValList = parent.val().split(' ');
@@ -166,7 +162,7 @@ $('input').searchSuggest('destroy');
                         parent.focus();
                     });
                 });
-            } 
+            }; 
 
             /**将提示框中所有列的hover样式去掉**/
             var unHoverAll = function(ddiv,opts){
@@ -176,12 +172,12 @@ $('input').searchSuggest('destroy');
                 ddiv.find('.' + opts.listHoverCSS).removeClass(opts.listHoverCSS);
                 
                 setDescription(ddiv,opts);
-            } 
+            }; 
 
             /**在提示框中取得当前选中的提示关键字**/
             var getPointWord = function(p) {
                 return p.find('div:first').text()
-            } 
+            }; 
 
             /**刷新提示框,并设定样式**/
             var refreshDropDiv = function(parent, json,ddiv,opts){
@@ -209,11 +205,12 @@ $('input').searchSuggest('destroy');
                 //防止ajax返回之前输入框失去焦点导致提示框不消失 
                 parent.focus();
                 ddiv.fadeIn(500);
-            } 
+            }; 
 
             /**通过 ajax 或 json 参数获取数据**/
             var getData = function(word, parent, callback, ddiv, opts) {
                 var json;
+                var validData;
                 var ddiv = ddiv || dropDiv;
                 var opts = opts || options;
 
@@ -239,40 +236,36 @@ $('input').searchSuggest('destroy');
                 }else{
                     /**没有给出url 参数，则从 json 参数获取或自行构造json帮助内容 **/
                     json = opts.json;
-
+                     validData = checkData(json);
+                    //本地的 json 数据
+                    if(validData && $.trim(word) != ''){ //输入不为空时则进行匹配
+                        var jsonStr = "{'data':[";
+                        for (var i = json.data.length - 1; i >= 0; i--) {
+                           if(json.data[i].word.indexOf(word) != -1 || word.indexOf(json.data[i].word) != -1){
+                                jsonStr += "{'id':'" + json.data[i].id 
+                                    + "','word':'"+ json.data[i].word
+                                    + "', 'description': '" + json.data[i].description 
+                                    + "'},";
+                            }
+                        };
+                        jsonStr += "],'defaults':'" + json.defaults + "'}";
+                        
+                        //字符串转化为 js 对象
+                        json = (new Function("return "+jsonStr ))();
+                    }
                     callback(parent, json, ddiv, opts);
                 }//else
 
                 return;
-            }
+            };
             
             /** url 获取数据时，对数据的处理，作为 getData 的回调函数 **/
-            var processData = function(json,opts){
-                var opts = opts || options;
+            var processData = function(json){
 
-                validData = checkData(json);
+                return validData = checkData(json);
                 //url 请求的数据
-                if(!opts.url) return validData;
-
-                //本地的 json 数据
-                if(validData && $.trim(word) != ''){ //输入不为空时则进行匹配
-                    var jsonStr = "{'data':[";
-                    for (var i = json.data.length - 1; i >= 0; i--) {
-                       if(json.data[i].word.indexOf(word) != -1 || word.indexOf(json.data[i].word) != -1){
-                            jsonStr += "{'id':'" + json.data[i].id 
-                                + "','word':'"+ json.data[i].word
-                                + "', 'description': '" + json.data[i].description 
-                                + "'},";
-                        }
-                    };
-                    jsonStr += "],'defaults':'" + json.defaults + "'}";
-                    //alert(jsonStr);
-                    //json = json2;//JSON.parse(json2);
-                    //字符串转化为 js 对象
-                    json = (new Function("return "+jsonStr ))();
-                }
-                return json;
-            }
+                //if(!opts.url) return validData;
+            };
 
             /**检测 ajax 返回成功数据或 json 参数数据是否有效**/
             var checkData = function(json) {
@@ -290,7 +283,7 @@ $('input').searchSuggest('destroy');
                 }
 
                 return json;
-            }
+            };
 
             var loadCssFlie = function(filename){
                 //如果已经存在，则不加载
@@ -306,7 +299,7 @@ $('input').searchSuggest('destroy');
                 fileref.setAttribute('type', 'text/css');
                 fileref.setAttribute('href', filename);
                 document.getElementsByTagName('head')[0].appendChild(fileref);
-            }
+            };
 
             //参数设置
             var options = $.extend({
@@ -419,7 +412,7 @@ $('input').searchSuggest('destroy');
                     if ($(this).val() != '' && $(this).val() == $(this).attr('alt')) return;
 
                     var words = $(this).val().split(' ');
-                    getData( words[words.length-1], $this, refreshDropDiv);
+                    getData( words[words.length-1], $this, refreshDropDiv, dropDiv, options);
                 }).bind('blur', function() {
                     if (isOver && dropDiv.find('.' + options.listHoverCSS) != 0) return;
                     //文本输入框失去焦点则清空并隐藏提示层 
@@ -428,7 +421,7 @@ $('input').searchSuggest('destroy');
                     if ($(this).val() != '' && $(this).val() == $(this).attr('alt') || dropDiv.css('display') != 'none') return;
 
                     var words = $(this).val().split(' ');
-                    getData( words[words.length-1], $this, refreshDropDiv);
+                    getData( words[words.length-1], $this, refreshDropDiv, dropDiv, options);
                     //setDescription();
                 });
 
@@ -452,6 +445,6 @@ $('input').searchSuggest('destroy');
                 $(this).unbind(); //首先解除所有的事件绑定
             })
         }
-    }
+    };
 
 })(jQuery);
