@@ -39,6 +39,9 @@
     overflow: hidden;
     word-break: break-all;
 }
+.jhover .desc{
+    color: #dd0;
+}
 .search-suggest .word {
     float:left;
     padding-left: 1%;
