@@ -351,4 +351,4 @@ jQuery 搜索建议插件
 
 使用效果参考
 -----------------------------
-http://lzw.me/pages/demo/jquery_search_suggest_plugin/(http://lzw.me/pages/demo/jquery_search_suggest_plugin/)
+http://lzw.me/pages/demo/jquery_search_suggest_plugin/
