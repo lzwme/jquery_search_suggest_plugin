@@ -4,7 +4,7 @@ jQuery 搜索建议插件
 
 插件使用方法
 ============================
-安装使用方法步骤
+安装使用步骤
 ----------------------------
 ### 1. 在页面引入 jQuery.j 及本插件脚本
 
@@ -348,3 +348,7 @@ jQuery 搜索建议插件
 	topoffset:16,           //提示框与输入框的距离，缺省为5
 	processData: processData, //格式化数据的方法，参考 json 参数的格式进行处理
 	getData: getData,       //获取数据的方法，默认以插件定义为准
+
+使用效果参考
+-----------------------------
+http://lzw.me/pages/demo/jquery_search_suggest_plugin/(http://lzw.me/pages/demo/jquery_search_suggest_plugin/)
