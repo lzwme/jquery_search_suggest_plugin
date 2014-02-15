@@ -8,7 +8,7 @@
     !window.jQuery && document.write('<script src="js/jquery-1.9.1.min.js"><\/script>');
     </script>
 
-    <script type="text/javascript" src="js/search-suggest.js"></script>
+    <script type="text/javascript" src="js/search-suggest.min.js"></script>
     <script type="text/javascript">
         $(function() {
 
@@ -79,7 +79,7 @@
                 /*width:350,   提示框的宽度，缺省为输入框的宽度相同*/
                 topoffset: 6,  /*提示框与输入框的距离，缺省为5*/
                 style: 'list',
-                cssFile: 'css/search-suggest.css',
+                cssFile: 'css/search-suggest.black.css',
                 tpl: '<div class="list"><div class="word" rel_id="st_{id}">{word}</div><div class="desc">约{description}条记录</div></div>',
                 processData: function(json){// url 获取数据时，对数据的处理，作为 getData 的回调函数
                     if(!json || json.result.length == 0) return false;
@@ -148,6 +148,7 @@
                 topoffset: 6,  /*提示框与输入框的距离，缺省为5*/
                 style: 'list',
                 cssFile: 'css/search-suggest.css',
+                multiWord: true,
                 getData: function(word, parent, callback,ddiv,opts) {//数据获取方法
                     //if(!word) return;
                     console.log(word);
@@ -409,9 +410,9 @@
                 width:380,   //*提示框的宽度，缺省为输入框的宽度相同/
                 topoffset: 16,  //*提示框与输入框的距离，缺省为5/
                 style: 'default',
-                cssFile: 'css/search-suggest.css'
-
-            });//*/
+                cssFile: 'css/search-suggest.css',
+                multiWord: true
+            });
         });
     </script>
     </head>

@@ -1,7 +1,8 @@
 /*******************************************
  * @date    : 2013-07-18
+ * @update  : 2014-02-15
  * Depends  : jquery.js
- * author   : l@lzw.me
+ * author   : l@lzw.me 志文工作室(http://lzw.me)
  * function : 搜索框提示功能插件
  */
 /*******************************************
@@ -66,7 +67,7 @@ $('input').searchSuggest('destroy');
     /* 搜索建议插件 */
     $.fn.searchSuggest = function(opts) {
         //方法判断
-        if ( methods[opts] ) {
+        if (typeof opts == 'string' && methods[opts] ) {
             //如果是方法，则参数第一个为函数名，从第二个开始为函数参数
             return methods[ opts ].apply( this, Array.prototype.slice.call( arguments, 1 ));
         }else if(typeof opts === 'object' || !opts){
@@ -144,8 +145,8 @@ $('input').searchSuggest('destroy');
 
             /**将新建dom对象插入到提示框中,并重新绑定mouseover事件监听**/
             var jebind = function(parent, a, ddiv,opts){
-                var ddiv = ddiv || dropDiv;
-                var opts = opts || options;
+                var ddiv = ddiv || dropDiv,
+                    opts = opts || options;
 
                 ddiv.append(a);
                 setDescription(ddiv,opts);
@@ -155,9 +156,14 @@ $('input').searchSuggest('destroy');
                         $(this).addClass(opts.listHoverCSS);
                         setDescription(ddiv,opts);
                     }).unbind('click').click(function() {
-                        var inputValList = parent.val().split(' ');
-                        inputValList[inputValList.length - 1] = getPointWord($(this));
-                        parent.val(inputValList.join(' '));
+                        var inputValList;
+                        if(opts.multiWord){//空格分隔的多关键字处理
+                            inputValList = parent.val().split(' ');
+                            inputValList[inputValList.length - 1] = getPointWord($(this));
+                            parent.val(inputValList.join(' '));
+                        }else{
+                            parent.val(getPointWord($(this)));
+                        }
                         //ddiv.empty().hide();
                         parent.focus();
                     });
@@ -166,8 +172,8 @@ $('input').searchSuggest('destroy');
 
             /**将提示框中所有列的hover样式去掉**/
             var unHoverAll = function(ddiv,opts){
-                var ddiv = ddiv || dropDiv;
-                var opts = opts || options;
+                var ddiv = ddiv || dropDiv,
+                    opts = opts || options;
 
                 ddiv.find('.' + opts.listHoverCSS).removeClass(opts.listHoverCSS);
                 
@@ -181,8 +187,9 @@ $('input').searchSuggest('destroy');
 
             /**刷新提示框,并设定样式**/
             var refreshDropDiv = function(parent, json,ddiv,opts){
-                var ddiv = ddiv || dropDiv;
-                var opts = opts || options;
+                var left, height, top, width,
+                    ddiv = ddiv || dropDiv,
+                    opts = opts || options;
 
                 json = validData = processData(json);
 
@@ -191,10 +198,11 @@ $('input').searchSuggest('destroy');
                     return false;
                 }
 
-                var left = parent.offset().left;
-                var height = parent.height();
-                var top = parent.offset().top + opts.topoffset + height;
-                var width = opts.width || parent.width() + 'px';
+                left = parent.offset().left;
+                height = parent.height();
+                top = parent.offset().top + opts.topoffset + height;
+                width = opts.width || parent.width() + 'px';
+                
                 ddiv.empty();
                 ddiv.css({
                     'left': left,
@@ -209,10 +217,9 @@ $('input').searchSuggest('destroy');
 
             /**通过 ajax 或 json 参数获取数据**/
             var getData = function(word, parent, callback, ddiv, opts) {
-                var json;
-                var validData;
-                var ddiv = ddiv || dropDiv;
-                var opts = opts || options;
+                var json, validData,
+                    ddiv = ddiv || dropDiv,
+                    opts = opts || options;
 
 
                 /**给了url参数，则从服务器 ajax 请求帮助的 json **/
@@ -252,6 +259,7 @@ $('input').searchSuggest('destroy');
                         
                         //字符串转化为 js 对象
                         json = (new Function("return "+jsonStr ))();
+                        console.log(json)
                     }
                     callback(parent, json, ddiv, opts);
                 }//else
@@ -308,16 +316,17 @@ $('input').searchSuggest('destroy');
                 json: {
                     'data':[
                         {'id':'0','word':'lzw.me','description':'http://lzw.me'},
-                        {'id':'1','word':'w1.lzw.me','description':'http://w1.lzw.me'},
-                        {'id':'2','word':'g.lzw.me','description':'http://g.lzw.me'}
+                        {'id':'1','word':'w1.lzw.me','description':'http://w1.lzw.me'}
                     ],
                     'defaults':'http://lzw.me'
                 },
                 style: 'default',   //风格样式，[line,list,default]
                 cssFile: '/our/css/search-suggest.css',
+                dropDivClassName: 'search-suggest', //提示框样式名称
                 listHoverCSS: 'jhover', //提示框列表鼠标悬浮的样式
                 tpl: '<div class="list"><div class="word" rel_id="st_{id}">{word}</div><div class="desc">{description}</div></div>',
                 //行模板
+                multiWord: false,  //以空格分隔的多关键字支持
                 processData: processData, //格式化数据的方法
                 getData: getData,  //获取数据的方法
                 topoffset: 5,
@@ -339,14 +348,14 @@ $('input').searchSuggest('destroy');
 
             //是否已经初始化的检测
             var data = this.data('searchsuggest');
+
             if(data){
                 return this;
             }
             this.data('searchsuggest',{target:this, options:options});
             loadCssFlie(options.cssFile);
 
-            var dropDiv = $('<div class="search-suggest"></div>').appendTo('body');
-            //var dropDiv = $(this).after('<div class="search-suggest" id="search_suggest_'+ $(this).attr('id') +'"></div>').next();
+            var dropDiv = $('<div class="' + options.dropDivClassName + '"></div>').appendTo('body');
 
             var isOver = false;
             dropDiv.hover(function() {
@@ -362,8 +371,8 @@ $('input').searchSuggest('destroy');
 
                 $(this).bind('keydown', function(event) {
                     if (dropDiv.css('display') != 'none') { //当提示层显示时才对键盘事件处理 
-                        var currentList = dropDiv.find('.' + options.listHoverCSS);
-                        var tipsWord = '';
+                        var currentList = dropDiv.find('.' + options.listHoverCSS),
+                            tipsWord = '';//提示列表上被选中的关键字
                         if (event.keyCode == options.keyDown) { //如果按的是向下方向键 
                             if (currentList.length == 0) {
                                 //如果提示列表没有一个被选中,则将列表第一个选中 
@@ -394,10 +403,14 @@ $('input').searchSuggest('destroy');
 
                         //支持空格为分割的多个提示
                         if(tipsWord != ''){
-                            var inputVal = $(this).val();
-                            var inputValList = inputVal.split(' ');
-                            inputValList[inputValList.length - 1] = tipsWord;
-                            $(this).val(inputValList.join(' '));
+                            if (opts.multiWord) {//支持空格分隔的多个关键字提示
+                                var inputVal = $(this).val();
+                                var inputValList = inputVal.split(' ');
+                                inputValList[inputValList.length - 1] = tipsWord;
+                                $(this).val(inputValList.join(' '));
+                            }else{
+                                $(this).val(tipsWord);
+                            }
                             return false;
                         }
                     }
@@ -405,42 +418,64 @@ $('input').searchSuggest('destroy');
                     //当按下键之前记录输入框值,以方便查看键弹起时值有没有变 
                     $(this).attr('alt', $(this).val());
                 }).bind('keyup', function(event) {
+                    var word, words;
+
                     //如果弹起的键是向上或向下方向键则返回 
                     if (event.keyCode == options.keyDown || event.keyCode == options.keyUp) return;
-
+                    
+                    word = $(this).val();
+                    
                     //若输入框值没有改变或变为空则返回
-                    if ($(this).val() != '' && $(this).val() == $(this).attr('alt')) return;
+                    if ($.trim(word) != '' && word == $(this).attr('alt')) return;
 
-                    var words = $(this).val().split(' ');
-                    getData( words[words.length-1], $this, refreshDropDiv, dropDiv, options);
+                    if (opts.multiWord) {
+                        words = word.split(' ');
+                        word = words[words.length-1];
+                    }
+
+                    getData( $.trim(word), $this, refreshDropDiv, dropDiv, options);
                 }).bind('blur', function() {
                     if (isOver && dropDiv.find('.' + options.listHoverCSS) != 0) return;
                     //文本输入框失去焦点则清空并隐藏提示层 
                     dropDiv.empty().hide();
                 }).bind('click', function(){ //单击输入框时，应显示提示
-                    if ($(this).val() != '' && $(this).val() == $(this).attr('alt') || dropDiv.css('display') != 'none') return;
+                    var word, words;
 
-                    var words = $(this).val().split(' ');
-                    getData( words[words.length-1], $this, refreshDropDiv, dropDiv, options);
+                    word = $(this).val();
+                    
+                    if ($.trim(word) != '' && word == $(this).attr('alt') || dropDiv.css('display') != 'none') return;
+
+                    if (opts.multiWord) {
+                        words = word.split(' ');
+                        word = words[words.length-1];
+                    }
+
+                    getData( $.trim(word), $this, refreshDropDiv, dropDiv, options);
                     //setDescription();
                 });
 
             });
-
         },
         show: function(){
-            $('.search-suggest').show();
+            var data = this.data('searchsuggest');
+            if (data && data.options) {
+                $("." + data.options.dropDivClassName).show();
+            };
             return this;
         },
         hide: function(){
-            $('.search-suggest').hide();
+            var data = this.data('searchsuggest');
+            if (data && data.options) {
+                $("." + data.options.dropDivClassName).hide();
+            };
             return this;
         },
         //销毁
         destroy: function(){
-            $('.search-suggest').remove();
-            this.removeData('searchsuggest');
-
+            var data = this.data('searchsuggest');
+            if (data && data.options) {
+                $("." + data.options.dropDivClassName).remove();
+            };
             return this.each(function(){
                 $(this).unbind(); //首先解除所有的事件绑定
             })

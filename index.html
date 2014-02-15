@@ -6,8 +6,8 @@
     <title>搜索建议自动智能提示 jQuery 插件使用效果示例</title>
     <meta name="keywords" content="搜索建议,智能提示,搜索框提示,jQuery 插件">
     <meta name="description" content="由志文工作室开发的搜索建议 jQuery 插件，提供三种主要显示风格">
-    <link href="./css/bootstrap.css" rel="stylesheet">
-    <link href="./css/bootstrap-responsive.css"  rel="stylesheet">
+    <link href="./css/bootstrap.min.css" rel="stylesheet">
+    <link href="./css/bootstrap-responsive.min.css"  rel="stylesheet">
     <style type="text/css">
       body {
         padding-top: 60px;
@@ -79,6 +79,10 @@
                         <tr>
                             <td>百度搜索建议</td>
                             <td><input type="text" size="50" id="baidu_line" autocomplete="off" /></td>
+                        </tr>
+                        <tr>
+                            <td>百度搜索建议(多关键字)</td>
+                            <td><input type="text" size="50" id="_baidu_line" autocomplete="off" /></td>
                         </tr>
                         <tr>
                             <td>淘宝搜索建议</td>
@@ -310,8 +314,10 @@ json: {
 },                      //无 url 参数时从这里加载数据，注意格式
 style: 'default',       //风格样式，[line,list,default]
 cssFile: 'css/search-suggest.css', //提示框加载的 css 样式文件
+dropDivClassName: 'search-suggest', //提示框样式类名称，默认为 “search-suggest”
 listHoverCSS: 'jhover', //提示框列表鼠标悬浮的样式
 tpl:                    //行模板
+mutilWord: false,  		//以空格分隔的多关键字支持,默认为但关键字
 width: 300,             //提示框的宽度，缺省为输入框的宽度相同
 topoffset:16,           //提示框与输入框的距离，缺省为5
 processData: processData, //格式化数据的方法，参考 json 参数的格式进行处理
@@ -330,9 +336,9 @@ getData: getData,       //获取数据的方法，默认以插件定义为准
     !window.jQuery && document.write('<script src="./js/jquery-1.9.1.min.js"><\/script>');
     </script>
     <!--script type='text/javascript' src='http://code.jquery.com/jquery.min.js?ver=1'></script-->
-    <script src="./js/bootstrap.js"></script>
+    <script src="./js/bootstrap.min.js"></script>
 
-    <script type="text/javascript" src="./js/search-suggest.js"></script>
+    <script type="text/javascript" src="./js/search-suggest.min.js"></script>
 
 
     <script type="text/javascript">
@@ -356,6 +362,58 @@ getData: getData,       //获取数据的方法，默认以插件定义为准
                 topoffset: 6,  /*提示框与输入框的距离，缺省为5*/
                 style: 'line',
                 cssFile: 'css/search-suggest.css',
+                processData: function(json){// url 获取数据时，对数据的处理，作为 getData 的回调函数
+                    if(!json || json.s.length == 0) return false;
+
+                    console.log(json);
+
+                    var jsonStr = "{'data':[";
+                    for (var i = json.s.length - 1; i >= 0; i--) {
+                        jsonStr += "{'id':'" + i 
+                            + "','word':'"+ json.s[i]
+                            + "', 'description': ''},";
+                    }
+                    jsonStr += "],'defaults':'baidu'}";
+
+                    //字符串转化为 js 对象
+                    return json = (new Function("return "+jsonStr ))();
+                },
+                getData: function(word, parent, callback) {//数据获取方法
+                    if(!word) return;
+                    $.ajax({
+                        type: 'GET',
+                        /*data: "word=" + word,*/
+                        url: 'http://unionsug.baidu.com/su?p=3&t='+ (new Date()).getTime() +'&wd=' + encodeURIComponent(word) + '&cb=?',
+                        //'http://suggest.taobao.com/sug?code=utf-8&extras=1&q='+word+'&callback=?'
+                        dataType: 'json',
+                        timeout: 3000,
+                        success: function(data) {
+                            callback(parent, data);
+                        },
+                        error: function(data){callback(parent, data);}
+                    });
+                }
+
+            });
+
+            $("#_baidu_line").searchSuggest({
+                url: 'http://unionsug.baidu.com/su?p=3&t='+ (new Date()).getTime() +'&wd=', /*优先从url ajax 请求 json 帮助数据，注意最后一个参数为关键字请求参数*/
+                jsonp: 'cb',/*如果从 url 获取数据，并且需要跨域，则该参数必须设置*/
+                json:{
+                    'data':[
+                        {'id':'0','word':'baidu','description':''},
+                        {'id':'1','word':'lzw.me','description':''},
+                        {'id':'2','word':'w1.lzw.me','description':''},
+                        {'id':'3','word':'g.lzw.me','description':''},
+                        {'id':'4','word':'seo.lzw.me','description':''}
+                    ],
+                    'defaults':'http://lzw.me'
+                },
+                width:300,   /*提示框的宽度，缺省为输入框的宽度相同*/
+                topoffset: 6,  /*提示框与输入框的距离，缺省为5*/
+                style: 'line',
+                cssFile: 'css/search-suggest.css',
+				multiWord: true,
                 processData: function(json){// url 获取数据时，对数据的处理，作为 getData 的回调函数
                     if(!json || json.s.length == 0) return false;
 
@@ -476,6 +534,7 @@ getData: getData,       //获取数据的方法，默认以插件定义为准
                 topoffset: 6,  /*提示框与输入框的距离，缺省为5*/
                 style: 'list',
                 cssFile: 'css/search-suggest.css',
+				multiWord: true,
                 getData: function(word, parent, callback,ddiv,opts) {//数据获取方法
                     //if(!word) return;
                     console.log(word);
@@ -640,8 +699,8 @@ getData: getData,       //获取数据的方法，默认以插件定义为准
                 width:380,   //提示框的宽度，缺省为输入框的宽度相同
                 topoffset: 16,  //*提示框与输入框的距离，缺省为5
                 style: 'default',
-                cssFile: 'css/search-suggest.css'
-
+                cssFile: 'css/search-suggest.css',
+				multiWord: true
             });
         });
     </script>
