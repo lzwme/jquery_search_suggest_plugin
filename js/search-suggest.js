@@ -30,7 +30,7 @@ $('input').searchSuggest({
 2. 销毁：
 $('input').searchSuggest('destroy');
 ********************************************/
-!window.jQuery && document.writeln("<script src=\"http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js?ver=1.9.1\"></script>");
+!window.jQuery && document.writeln("<script src=\"http://code.jquery.com/jquery-1.11.0.min.js?ver=1.11.0\"></script>");
 
 (function($) {
     /**
