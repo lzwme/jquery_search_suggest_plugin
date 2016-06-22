@@ -418,7 +418,7 @@ $('input').searchSuggest('destroy');
 
                     getData($.trim(word), $this, refreshDropDiv, dropDiv, options);
                 }).bind('blur', function() {
-                    if (isOver && dropDiv.find('.' + options.listHoverCSS).length) {
+                    if (isOver) {
                         return;
                     }
                     //文本输入框失去焦点则清空并隐藏提示层

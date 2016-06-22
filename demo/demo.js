@@ -94,7 +94,7 @@ $(function() {
                 '3. 区间的写法：<pre>foo=[x,y]<br>foo=(x,y)<br>foo=[x,] foo=[,y]</pre>' +
                 '4. 精确匹配的写法：<pre>foo==a </pre>' +
                 '5. 多条件的搜索：<pre>foo=a bar=b<br>foo=[x,y] bar={a,b} far!=c</pre>' +
-                '<br>更多解释请参考: <a href="/help/index.html#log-search" target="_blank">帮助文档</a>'
+                '<br>更多解释请参考: <a href="/pages/demo/zinhelp/#log-search" target="_blank">帮助文档</a>'
 
         },
         width: 380, //提示框的宽度，缺省为输入框的宽度相同
