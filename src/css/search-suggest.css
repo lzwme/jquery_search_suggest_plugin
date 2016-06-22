@@ -1,0 +1,82 @@
+.search-suggest {
+    position: absolute;
+    z-index: 10;
+    display: none;
+    cursor: hand;
+    border: 1px solid rgba(150, 150, 150, 0.6);
+    padding: 0.2em;
+    border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    color: #000;
+    font-size: 0.9em;
+    font-family: 'tahoma', 'Microsoft YaHei', 'Segoe UI', Arial, 'Microsoft Yahei', Simsun, 'sans-serif';
+    background: #fff
+}
+
+.search-suggest .content {
+    width: 49%;
+    float: left;
+    background: #fff;
+    border-right: 1px #934 dashed;
+    border-radius: 3px
+}
+
+.search-suggest .jhover {
+    background-color: #07d;
+    color: #fff;
+    text-shadow: 0 0 1px #ccc;
+    background-image: linear-gradient(to bottom, rgba(0, 110, 220, 0.3), #07d, #07d, rgba(0, 110, 220, 0.3));
+}
+
+.search-suggest .list {
+    float: left;
+    width: 98%;
+    overflow: hidden;
+    border-bottom: 1px rgba(200, 200, 200, 0.2) dashed;
+    padding: 1%;
+}
+
+.search-suggest .desc {
+    display: none;
+    float: right;
+    color: gray;
+    text-align: right;
+    font-size: 10pt;
+    width: 50%;
+    overflow: hidden;
+    word-break: break-all;
+}
+
+.jhover .desc {
+    color: #dd0;
+}
+
+.search-suggest .word {
+    float: left;
+    padding-left: 1%;
+    word-break: break-all;
+}
+
+.search-suggest .description {
+    float: right;
+    color: gray;
+    text-align: left;
+    font-size: 9pt;
+    width: 47%;
+    padding: 1.5%;
+    box-shadow: 0 0 1px #fdc;
+    border-radius: 5px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    color: #000;
+    text-shadow: 0 0 1px rgba(0, 0, 0, 0.3);
+    background: rgba(220, 220, 220, 0.5);
+    background-image: linear-gradient(to bottom, #eee, #ccc, #ccc, #eee);
+    background-image: -webkit-radial-gradient(left bottom, ellipse cover, #ccc, #ddd, #eee, #fff, #eee, #ddd, #ccc);
+}
+
+.search-suggest .description pre {
+    padding: 3px 2px 3px 8px;
+    margin: 0;
+}
